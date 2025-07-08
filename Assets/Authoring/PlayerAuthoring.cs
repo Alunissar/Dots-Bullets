@@ -8,7 +8,9 @@ class PlayerAuthoring : MonoBehaviour
     public int BulletCount = 10;
     [Range(0f, 180f)]
     public float BulletSpread = 5f;
-    
+
+    public GameObject spriteFrd;
+    public GameObject spriteBck;
 
     class PlayerBaker : Baker<PlayerAuthoring>
     {
@@ -21,10 +23,12 @@ class PlayerAuthoring : MonoBehaviour
                 MoveSpeed = authoring.MoveSpeed,
                 BulletPrefab = GetEntity(authoring.BulletPrefab, TransformUsageFlags.Dynamic),
                 BulletCount = authoring.BulletCount,
-                BulletSpread = authoring.BulletSpread
+                BulletSpread = authoring.BulletSpread,
+                spriteFrd = GetEntity(authoring.spriteFrd, TransformUsageFlags.Renderable),
+                spriteBck = GetEntity(authoring.spriteBck, TransformUsageFlags.Renderable),
             });
-            
-            
+
+
         }
     }
 }

@@ -1,4 +1,5 @@
 using Unity.Entities;
+using UnityEngine;
 
 public struct PlayerComponent : IComponentData
 {
@@ -6,4 +7,6 @@ public struct PlayerComponent : IComponentData
     public Entity BulletPrefab;
     public int BulletCount;
     public float BulletSpread;
+    public Entity spriteFrd;
+    public Entity spriteBck;
 }

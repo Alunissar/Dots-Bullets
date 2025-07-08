@@ -47,7 +47,16 @@ partial struct PlayerSystem : ISystem
         faceDirection = math.normalize((Vector2)inputComponent.MousePos - (Vector2)Camera.main.WorldToScreenPoint(playerTransform.Position));
         
         playerTransform.Rotation = Quaternion.LookRotation(new Vector3(faceDirection.x,0), Vector3.forward);
+        
+        LocalTransform sprtFdTfm = entityManager.GetComponentData<LocalTransform>(playerComponent.spriteFrd);
+        LocalTransform sprtBkTfm = entityManager.GetComponentData<LocalTransform>(playerComponent.spriteBck);
 
+        sprtFdTfm.Scale = faceDirection.y>0? 0f : 1f;
+        sprtBkTfm.Scale = faceDirection.y<=0? 0f : 1f;
+
+        entityManager.SetComponentData(playerComponent.spriteFrd, sprtFdTfm);
+        entityManager.SetComponentData(playerComponent.spriteBck, sprtBkTfm);
+    
         entityManager.SetComponentData(playerEntity, playerTransform);
     }
     [BurstCompile]
