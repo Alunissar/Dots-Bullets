@@ -15,6 +15,8 @@ partial struct PlayerSystem : ISystem
 
     private PlayerComponent playerComponent;
     private InputComponent inputComponent;
+
+    private Vector2 faceDirection;
     
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -22,7 +24,6 @@ partial struct PlayerSystem : ISystem
         
     }
 
-    //[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         entityManager = state.EntityManager;
@@ -43,10 +44,9 @@ partial struct PlayerSystem : ISystem
 
         playerTransform.Position.xz += inputComponent.Movement * playerComponent.MoveSpeed * SystemAPI.Time.DeltaTime;
 
-        Vector2 dir = (Vector2)inputComponent.MousePos - (Vector2)Camera.main.WorldToScreenPoint(playerTransform.Position);
-        float angle = math.degrees(math.atan2(dir.x, dir.y));
-
-        playerTransform.Rotation = Quaternion.AngleAxis(angle, Vector3.up);
+        faceDirection = math.normalize((Vector2)inputComponent.MousePos - (Vector2)Camera.main.WorldToScreenPoint(playerTransform.Position));
+        
+        playerTransform.Rotation = Quaternion.LookRotation(new Vector3(faceDirection.x,0), Vector3.forward);
 
         entityManager.SetComponentData(playerEntity, playerTransform);
     }
@@ -66,11 +66,13 @@ partial struct PlayerSystem : ISystem
 
                 LocalTransform playerTransform = entityManager.GetComponentData<LocalTransform>(playerEntity);
                 LocalTransform bulletTransform = entityManager.GetComponentData<LocalTransform>(bulletEntity);
+                
+                float angle = math.degrees(math.atan2(faceDirection.x, faceDirection.y));
 
                 float offset = (math.frac((float)SystemAPI.Time.ElapsedTime * 3) - .5f) * (playerComponent.BulletSpread * (i - playerComponent.BulletCount / 2));
-                bulletTransform.Rotation = playerTransform.Rotation * Quaternion.AngleAxis(offset, playerTransform.Up());
+                bulletTransform.Rotation = Quaternion.AngleAxis(angle + offset, new float3(0,1,0));
 
-                bulletTransform.Position = playerTransform.Position + (playerTransform.Forward() * 1f);
+                bulletTransform.Position.xz = playerTransform.Position.xz + ((float2)faceDirection * 1f);
 
                 entityManager.SetComponentData(bulletEntity, bulletTransform);
 
